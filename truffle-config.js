@@ -24,6 +24,9 @@
 // const fs = require('fs');
 // const mnemonic = fs.readFileSync(".secret").toString().trim();
 
+require('dotenv').config({ path: './src/.env' })
+const HDWalletProvider = require('@truffle/hdwallet-provider');
+
 module.exports = {
   /**
    * Networks define how you connect to your ethereum client and let you set the
@@ -36,6 +39,12 @@ module.exports = {
    */
 
   networks: {
+    development: {
+      provider: () => new HDWalletProvider(process.env.MNEMONIC, process.env.RPC_URL), 
+      network_id: Number(process.env.NETWORK_ID),   // This network is yours, in the cloud. 
+      production: true,    // Treats this network as if it was a public net. (default: false)
+      skipDryRun: true
+    }
     // Useful for testing. The `development` name is special - truffle uses it by default
     // if it's defined here and no other network is specified at the command line.
     // You should run a client (like ganache-cli, geth or parity) in a separate terminal

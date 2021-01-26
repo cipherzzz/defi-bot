@@ -215,7 +215,7 @@ async function checkArb(args) {
 
     // Play alert tone
     playSound()
-
+    
     // Call arb contract
     await trade(assetOrder[0], ASSET_ADDRESSES[assetOrder[0]], ASSET_ADDRESSES[assetOrder[1]], zrxOrder, inputAssetAmount, oneSplitData)
   }
@@ -224,6 +224,9 @@ async function checkArb(args) {
 
 // TRADE EXECUTION
 async function trade(flashTokenSymbol, flashTokenAddress, arbTokenAddress, orderJson, fillAmount, oneSplitData) {
+  
+  console.log(flashTokenSymbol, flashTokenAddress, arbTokenAddress, orderJson, fillAmount, oneSplitData)
+  
   const FLASH_AMOUNT = toTokens('10000', flashTokenSymbol) // 10,000 WETH
   const FROM_TOKEN = flashTokenAddress // WETH
   const FROM_AMOUNT = fillAmount // '1000000'
@@ -260,7 +263,7 @@ async function trade(flashTokenSymbol, flashTokenAddress, arbTokenAddress, order
   const minReturnWtihSplippage = minReturnWithSlippage = (new web3.utils.BN(minReturn)).mul(new web3.utils.BN('995')).div(new web3.utils.BN('1000')).toString()
 
   // Perform Trade
-  receipt = await traderContract.methods.getFlashloan(
+  let receipt = await traderContract.methods.getFlashloan(
     flashTokenAddress, // address flashToken,
     FLASH_AMOUNT, // uint256 flashAmount,
     arbTokenAddress, // address arbToken,
@@ -272,7 +275,7 @@ async function trade(flashTokenSymbol, flashTokenAddress, arbTokenAddress, order
     gas: process.env.GAS_LIMIT,
     gasPrice: web3.utils.toWei(process.env.GAS_PRICE, 'Gwei')
   })
-  console.log(receipt)
+  console.log(receipt.transactionHash)
 }
 
 // FETCH ORDERBOOK
@@ -307,7 +310,7 @@ async function checkMarkets() {
   try {
     await checkOrderBook(WETH, DAI)
   } catch (error) {
-    console.error(error)
+    console.error("Error retrieving market data")
     checkingMarkets = false
     return
   }
