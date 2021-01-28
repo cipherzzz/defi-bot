@@ -3,6 +3,8 @@ npm_modules/*
 node_modules
 node_modules/*
 .env
+.env.development
+.env.production
 logs/*
 logs
 # examples/*

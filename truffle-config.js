@@ -24,7 +24,12 @@
 // const fs = require('fs');
 // const mnemonic = fs.readFileSync(".secret").toString().trim();
 
-require('dotenv').config({ path: './src/.env' })
+if (process.env.NODE_ENV === "production") {
+    require('dotenv').config({ path: './src/.env.production' })
+  } else {
+    require('dotenv').config({ path: './src/.env.development' })
+  }
+  
 const HDWalletProvider = require('@truffle/hdwallet-provider');
 
 module.exports = {
@@ -40,10 +45,16 @@ module.exports = {
 
   networks: {
     development: {
-      provider: () => new HDWalletProvider(process.env.MNEMONIC, process.env.RPC_URL), 
+      provider: () => new HDWalletProvider(process.env.PRIVATE_KEY, process.env.RPC_URL), 
       network_id: Number(process.env.NETWORK_ID),   // This network is yours, in the cloud. 
       production: true,    // Treats this network as if it was a public net. (default: false)
       skipDryRun: true
+    },
+    mainnet: {
+      provider: () => new HDWalletProvider(process.env.PRIVATE_KEY, process.env.RPC_URL), 
+      network_id: 1,   
+      production: true,
+      gasPrice: 60000000000
     }
     // Useful for testing. The `development` name is special - truffle uses it by default
     // if it's defined here and no other network is specified at the command line.

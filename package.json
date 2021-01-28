@@ -4,6 +4,8 @@
   "description": "",
   "main": "index.js",
   "scripts": {
+    "run-development": "NODE_ENV=development && cd src && node index.js",
+    "migrate-development": "NODE_ENV=development && rm -rf ./src/abis && npx truffle migrate --reset",
     "start": "react-scripts start",
     "build": "react-scripts build",
     "test": "react-scripts test",
@@ -27,6 +29,7 @@
     "path": "^0.12.7",
     "play-sound": "",
     "sha3": "2.0.2",
+    "truffle": "^5.1.63",
     "web3": "",
     "web3-provider-engine": ""
   },

@@ -86,19 +86,16 @@ pragma solidity ^0.5.0;
 
 
 contract DyDxFlashLoan is Structs {
-    DyDxPool pool = DyDxPool(0x1E0447b19BB6EcFdAe1e4AE1694b0C3659614e4e);
-
-    address public WETH = 0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2;
-    address public SAI = 0x89d24A6b4CcB1B6fAA2625fE562bDD9a23260359;
-    address public USDC = 0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48;
-    address public DAI = 0x6B175474E89094C44Da98b954EedeAC495271d0F;
+    
+    address public POOL; 
+    address public WETH;
+    address public SAI; 
+    address public USDC; 
+    address public DAI;  
+    DyDxPool pool;
     mapping(address => uint256) public currencies;
 
     constructor() public {
-        currencies[WETH] = 1;
-        currencies[SAI] = 2;
-        currencies[USDC] = 3;
-        currencies[DAI] = 4;
     }
 
     modifier onlyPool() {
@@ -107,6 +104,21 @@ contract DyDxFlashLoan is Structs {
             "FlashLoan: could be called by DyDx pool only"
         );
         _;
+    }
+
+    function initDYDX(address poolAddress, address wethAddress, address saiAddress, address usdAddress, address daiAddress) internal {
+        POOL = poolAddress;
+        WETH = wethAddress;
+        SAI  = saiAddress;
+        USDC = usdAddress;
+        DAI  = daiAddress;
+        
+        currencies[WETH] = 1;
+        currencies[SAI] = 2;
+        currencies[USDC] = 3;
+        currencies[DAI] = 4;
+        
+        pool = DyDxPool(POOL);
     }
 
     function tokenToMarketId(address token) public view returns (uint256) {
@@ -203,14 +215,14 @@ contract TradingBot is DyDxFlashLoan {
     address payable OWNER;
 
     // OneSplit Config
-    address ONE_SPLIT_ADDRESS = 0xC586BeF4a0992C495Cf22e1aeEE4E446CECDee0E;
+    address ONE_SPLIT_ADDRESS; //0xC586BeF4a0992C495Cf22e1aeEE4E446CECDee0E;
     uint256 PARTS = 10;
     uint256 FLAGS = 0;
 
     // ZRX Config
-    address ZRX_EXCHANGE_ADDRESS = 0x61935CbDd02287B511119DDb11Aeb42F1593b7Ef;
-    address ZRX_ERC20_PROXY_ADDRESS = 0x95E6F48254609A6ee006F7D493c8e5fB97094ceF;
-    address ZRX_STAKING_PROXY = 0xa26e80e7Dea86279c6d778D702Cc413E6CFfA777; // Fee collector
+    address ZRX_EXCHANGE_ADDRESS;    //0x61935CbDd02287B511119DDb11Aeb42F1593b7Ef;
+    address ZRX_ERC20_PROXY_ADDRESS; //0x95E6F48254609A6ee006F7D493c8e5fB97094ceF;
+    address ZRX_STAKING_PROXY;       //0xa26e80e7Dea86279c6d778D702Cc413E6CFfA777; // Fee collector
 
     // Modifiers
     modifier onlyOwner() {
@@ -220,11 +232,43 @@ contract TradingBot is DyDxFlashLoan {
 
     // Allow the contract to receive Ether
     function () external payable  {}
+    
 
-    constructor() public payable {
+    constructor(address dydxPool, address weth, address sai, address usdc, address dai, address oneInchSplit, address zrxExchange,  address zrxErc20Proxy, address zrxStakingProxy) public payable {
+        
+        // DYDX - MAINNET
+        // address pool = 0x1E0447b19BB6EcFdAe1e4AE1694b0C3659614e4e;
+        // address weth = 0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2;
+        // address sai  = 0x89d24A6b4CcB1B6fAA2625fE562bDD9a23260359;
+        // address usdc = 0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48;
+        // address dai  = 0x6B175474E89094C44Da98b954EedeAC495271d0F;
+        
+        // ONE INCH - MAINNET
+        // ONE_SPLIT_ADDRESS = 0xC586BeF4a0992C495Cf22e1aeEE4E446CECDee0E;
+        
+        // ZRX - MAINNET
+        // ZRX_EXCHANGE_ADDRESS = 0x61935CbDd02287B511119DDb11Aeb42F1593b7Ef;
+        // ZRX_ERC20_PROXY_ADDRESS = 0x95E6F48254609A6ee006F7D493c8e5fB97094ceF;
+        // ZRX_STAKING_PROXY = 0xa26e80e7Dea86279c6d778D702Cc413E6CFfA777; // Fee collector
+        
+        // Set all addresses from constructor instead of hardcoding
+        initDYDX(dydxPool, weth, sai, usdc, dai);
+        initZRX(zrxExchange, zrxErc20Proxy, zrxStakingProxy);
+        initOneInch(oneInchSplit);
+        
         _getWeth(msg.value);
         _approveWeth(msg.value);
         OWNER = msg.sender;
+    }
+    
+    function initZRX(address zrxExchange,  address zrxErc20Proxy, address zrxStakingProxy) internal {
+        ZRX_EXCHANGE_ADDRESS = zrxExchange;
+        ZRX_ERC20_PROXY_ADDRESS = zrxErc20Proxy;
+        ZRX_STAKING_PROXY = zrxStakingProxy; // Fee collector
+    }
+    
+    function initOneInch(address oneSplit) internal {
+        ONE_SPLIT_ADDRESS = oneSplit;
     }
 
     function getFlashloan(address flashToken, uint256 flashAmount, address arbToken, bytes calldata zrxData, uint256 oneSplitMinReturn, uint256[] calldata oneSplitDistribution) external payable onlyOwner {
