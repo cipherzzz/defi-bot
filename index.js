@@ -57,8 +57,8 @@ const WETH = 'WETH'
 
 // ASSET ADDRESSES
 const ASSET_ADDRESSES = {
-  DAI: process.env.DAI_ADDRESS, //'0x6b175474e89094c44da98b954eedeac495271d0f'
-  WETH: process.env.WETH_ADDRESS //'0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2'
+  DAI: process.env.DAI_ADDRESS.toLowerCase(), //'0x6b175474e89094c44da98b954eedeac495271d0f'
+  WETH: process.env.WETH_ADDRESS.toLowerCase() //'0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2'
 }
 
 // DISPLAY LOGIC
@@ -264,7 +264,12 @@ async function trade(flashTokenSymbol, flashTokenAddress, arbTokenAddress, order
     from: process.env.ADDRESS,
     gas: process.env.GAS_LIMIT,
     gasPrice: web3.utils.toWei(process.env.GAS_PRICE, 'Gwei')
-  })
+  }).catch((error)=>{
+    console.log("caught error")
+    checkingMarkets = false
+    return
+  });
+  
   console.log(receipt.transactionHash)
 }
 
@@ -272,8 +277,8 @@ async function trade(flashTokenSymbol, flashTokenAddress, arbTokenAddress, order
 // https://0x.org/docs/api#get-srav3orderbook
 // Bids will be sorted in descending order by price
 async function checkOrderBook(baseAssetSymbol, quoteAssetSymbol) {
-  const baseAssetAddress = ASSET_ADDRESSES[baseAssetSymbol].substring(2,42).toLowerCase();
-  const quoteAssetAddress = ASSET_ADDRESSES[quoteAssetSymbol].substring(2,42).toLowerCase();
+  const baseAssetAddress = ASSET_ADDRESSES[baseAssetSymbol].substring(2,42);
+  const quoteAssetAddress = ASSET_ADDRESSES[quoteAssetSymbol].substring(2,42);
   const zrxResponse = await axios.get(`https://api.0x.org/sra/v3/orderbook?baseAssetData=0xf47261b0000000000000000000000000${baseAssetAddress}&quoteAssetData=0xf47261b0000000000000000000000000${quoteAssetAddress}&perPage=1000`)
   const zrxData = zrxResponse.data
 
