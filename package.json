@@ -4,7 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "run-development": "NODE_ENV=development && cd src && node index.js",
+    "run-development": "NODE_ENV=development && node index.js",
     "migrate-development": "NODE_ENV=development && rm -rf ./src/abis && npx truffle migrate --reset",
     "start": "react-scripts start",
     "build": "react-scripts build",

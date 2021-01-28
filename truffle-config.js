@@ -25,9 +25,9 @@
 // const mnemonic = fs.readFileSync(".secret").toString().trim();
 
 if (process.env.NODE_ENV === "production") {
-    require('dotenv').config({ path: './src/.env.production' })
+    require('dotenv').config({ path: '.env.production' })
   } else {
-    require('dotenv').config({ path: './src/.env.development' })
+    require('dotenv').config({ path: '.env.development' })
   }
   
 const HDWalletProvider = require('@truffle/hdwallet-provider');
@@ -101,10 +101,6 @@ module.exports = {
   mocha: {
     // timeout: 100000
   },
-
-  contracts_directory: './src/contracts',
-  contracts_build_directory: './src/abis',
-
   // Configure your compilers
   compilers: {
     solc: {

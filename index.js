@@ -83,15 +83,6 @@ const displayTokens = (amount, symbol) => {
 // UTILITIES
 const now = () => (moment().tz('America/Chicago').format())
 
-const SOUND_FILE = 'ding.mp3'
-const playSound = () => {
-  player.play(SOUND_FILE, function(err){
-    if(err) {
-      console.log("Error playing sound!")
-    }
-  })
-}
-
 
 // FORMATTERS
 const toTokens = (tokenAmount, symbol) => {
@@ -216,9 +207,6 @@ async function checkArb(args) {
       'Profit': displayTokens(netProfit.toString(), assetOrder[0]).padEnd(22, ' '),
       'Timestamp': now(),
     }])
-
-    // Play alert tone
-    playSound()
     
     // Call arb contract
     await trade(assetOrder[0], ASSET_ADDRESSES[assetOrder[0]], ASSET_ADDRESSES[assetOrder[1]], zrxOrder, inputAssetAmount, oneSplitData)
@@ -228,8 +216,6 @@ async function checkArb(args) {
 
 // TRADE EXECUTION
 async function trade(flashTokenSymbol, flashTokenAddress, arbTokenAddress, orderJson, fillAmount, oneSplitData) {
-  
-  console.log(flashTokenSymbol, flashTokenAddress, arbTokenAddress, orderJson, fillAmount, oneSplitData)
   
   const FLASH_AMOUNT = toTokens('10000', flashTokenSymbol) // 10,000 WETH
   const FROM_TOKEN = flashTokenAddress // WETH
@@ -321,9 +307,6 @@ async function checkMarkets() {
 
   checkingMarkets = false
 }
-
-// RUN APP
-playSound()
 
 // Check markets every n seconds
 const POLLING_INTERVAL = process.env.POLLING_INTERVAL || 3000 // 3 seconds
